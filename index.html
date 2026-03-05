@@ -1,33 +1,1040 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roman Bochkov | Portfolio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #0d1117; color: #e6edf3; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroPay — AI-бухгалтерия для бизнеса</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET & BASE ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #030712;
+      --surface:  #0d1117;
+      --border:   rgba(255,255,255,0.07);
+      --cyan:     #00e5ff;
+      --violet:   #7c3aed;
+      --green:    #00ffa3;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --font-h:   'Syne', sans-serif;
+      --font-b:   'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-b);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE OVERLAY ────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── UTILITY ──────────────────────────────────────────── */
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--cyan); border: 1px solid rgba(0,229,255,.25);
+      padding: 5px 14px; border-radius: 100px;
+      background: rgba(0,229,255,.05);
+    }
+    .tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+    /* ─── HEADER / NAV ─────────────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 16px 0;
+      border-bottom: 1px solid transparent;
+      transition: background .3s, border-color .3s, backdrop-filter .3s;
+    }
+    header.scrolled {
+      background: rgba(3,7,18,.8);
+      border-color: var(--border);
+      backdrop-filter: blur(20px);
+    }
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-family: var(--font-h); font-size: 22px; font-weight: 800;
+      color: #fff; text-decoration: none; letter-spacing: -.02em;
+    }
+    .logo span { color: var(--cyan); }
+    .nav-links {
+      display: flex; gap: 36px; list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: 8px;
+      font-family: var(--font-b); font-size: 14px; font-weight: 500;
+      cursor: pointer; text-decoration: none; border: none;
+      transition: all .25s;
+    }
+    .btn-primary {
+      background: var(--cyan); color: #000; font-weight: 700;
+    }
+    .btn-primary:hover { background: #33eaff; box-shadow: 0 0 28px rgba(0,229,255,.4); transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
+    .hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: all .3s; }
+
+    /* ─── HERO ─────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 120px 0 80px;
+      position: relative; overflow: hidden;
+    }
+    /* animated grid background */
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    }
+    /* glowing orbs */
+    .orb {
+      position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none;
+    }
+    .orb-1 { width: 600px; height: 600px; background: rgba(124,58,237,.15); top: -100px; right: -100px; animation: float 8s ease-in-out infinite; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(0,229,255,.08); bottom: -50px; left: -80px; animation: float 10s ease-in-out infinite reverse; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 700px; }
+    .hero-content .tag { margin-bottom: 28px; animation: fadeUp .6s ease both; }
+
+    .hero-title {
+      font-family: var(--font-h); font-size: clamp(42px, 6vw, 76px);
+      font-weight: 800; line-height: 1.05; letter-spacing: -.03em;
+      color: #fff; margin-bottom: 24px;
+      animation: fadeUp .6s .1s ease both;
+    }
+    .hero-title .accent { color: var(--cyan); position: relative; display: inline-block; }
+    .hero-title .accent::after {
+      content: ''; position: absolute; left: 0; bottom: 4px; width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+      border-radius: 2px;
+    }
+
+    .hero-sub {
+      font-size: 18px; color: var(--muted); font-weight: 300; max-width: 520px;
+      margin-bottom: 40px; line-height: 1.7;
+      animation: fadeUp .6s .2s ease both;
+    }
+    .hero-cta {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      animation: fadeUp .6s .3s ease both;
+    }
+    .btn-primary .arrow { transition: transform .2s; }
+    .btn-primary:hover .arrow { transform: translateX(4px); }
+
+    /* stats strip */
+    .hero-stats {
+      display: flex; gap: 48px; margin-top: 64px; flex-wrap: wrap;
+      animation: fadeUp .6s .4s ease both;
+    }
+    .stat-item { }
+    .stat-num {
+      font-family: var(--font-h); font-size: 32px; font-weight: 800;
+      color: #fff; letter-spacing: -.03em;
+    }
+    .stat-num span { color: var(--cyan); }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* dashboard mockup */
+    .hero-visual {
+      position: absolute; right: -40px; top: 50%; transform: translateY(-50%);
+      width: 520px; animation: fadeLeft .8s .3s ease both;
+    }
+    @media (max-width: 1000px) { .hero-visual { display: none; } }
+
+    .dashboard-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .dashboard-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    }
+    .d-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .d-title { font-family: var(--font-h); font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .d-badge { font-size: 11px; color: var(--green); background: rgba(0,255,163,.1); border: 1px solid rgba(0,255,163,.2); padding: 3px 10px; border-radius: 100px; }
+    .d-amount { font-family: var(--font-h); font-size: 38px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .d-delta { font-size: 13px; color: var(--green); }
+
+    /* mini bar chart */
+    .mini-chart { display: flex; align-items: flex-end; gap: 6px; height: 60px; margin-top: 20px; }
+    .bar {
+      flex: 1; border-radius: 4px 4px 0 0;
+      background: rgba(0,229,255,.15);
+      transition: background .3s;
+      animation: growBar .8s ease both;
+    }
+    .bar:hover { background: rgba(0,229,255,.4); }
+    .bar.active { background: var(--cyan); box-shadow: 0 0 12px rgba(0,229,255,.5); }
+
+    @keyframes growBar { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); } }
+
+    .d-list { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .d-list-item { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+    .d-list-label { color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .d-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .d-list-val { color: var(--text); font-weight: 500; }
+
+    /* floating mini cards */
+    .mini-card {
+      position: absolute; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 16px; font-size: 12px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.4);
+    }
+    .mc-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .mc-top { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+    .mc-val { font-family: var(--font-h); font-size: 15px; font-weight: 700; color: #fff; margin-top: 1px; }
+    .card-1 { top: -20px; left: -60px; animation: float 7s ease-in-out infinite; }
+    .card-2 { bottom: 10px; right: -30px; animation: float 9s ease-in-out infinite reverse; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeLeft { from { opacity: 0; transform: translateX(40px) translateY(-50%); } to { opacity: 1; transform: translateX(0) translateY(-50%); } }
+
+    /* ─── LOGOS STRIP ──────────────────────────────────────── */
+    .logos-strip {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .logos-label { text-align: center; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; }
+    .logos-track { display: flex; gap: 64px; align-items: center; animation: scroll 20s linear infinite; width: max-content; }
+    .logos-track:hover { animation-play-state: paused; }
+    .brand-name {
+      font-family: var(--font-h); font-size: 18px; font-weight: 700;
+      color: rgba(255,255,255,.2); white-space: nowrap;
+      transition: color .3s;
+    }
+    .brand-name:hover { color: rgba(255,255,255,.5); }
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ─── FEATURES ─────────────────────────────────────────── */
+    section { padding: 100px 0; position: relative; }
+
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-title {
+      font-family: var(--font-h); font-size: clamp(32px, 4vw, 52px);
+      font-weight: 800; letter-spacing: -.03em; color: #fff; margin: 16px 0 16px;
+    }
+    .section-sub { font-size: 17px; color: var(--muted); max-width: 480px; margin: 0 auto; font-weight: 300; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+    .feature-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px 28px;
+      position: relative; overflow: hidden;
+      transition: border-color .3s, transform .3s;
+      cursor: default;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at top left, rgba(0,229,255,.04), transparent 60%);
+      opacity: 0; transition: opacity .3s;
+    }
+    .feature-card:hover { border-color: rgba(0,229,255,.3); transform: translateY(-4px); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 20px;
+      background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.15);
+    }
+    .feature-title { font-family: var(--font-h); font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .feature-text { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* ─── HOW IT WORKS ─────────────────────────────────────── */
+    .how-bg { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+    .steps::before {
+      content: ''; position: absolute; top: 32px; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), var(--cyan), var(--border), transparent);
+    }
+    .step { padding: 48px 24px 32px; text-align: center; position: relative; }
+    .step-num {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--bg); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-h); font-size: 18px; font-weight: 800; color: var(--cyan);
+      margin: 0 auto 24px; position: relative; z-index: 1;
+      box-shadow: 0 0 0 8px var(--surface);
+    }
+    .step-title { font-family: var(--font-h); font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .step-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    /* ─── PRICING ──────────────────────────────────────────── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: center; }
+    .plan {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px 32px;
+      transition: transform .3s;
+    }
+    .plan:hover { transform: translateY(-4px); }
+    .plan.popular {
+      border-color: var(--cyan); position: relative;
+      transform: scale(1.04);
+      background: linear-gradient(135deg, rgba(0,229,255,.04), var(--surface));
+    }
+    .plan.popular:hover { transform: scale(1.04) translateY(-4px); }
+    .popular-badge {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--cyan); color: #000;
+      font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: 5px 16px; border-radius: 100px;
+    }
+    .plan-name { font-family: var(--font-h); font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 16px; }
+    .plan-price {
+      font-family: var(--font-h); font-size: 46px; font-weight: 800;
+      color: #fff; letter-spacing: -.04em; margin-bottom: 6px;
+    }
+    .plan-price sup { font-size: 22px; vertical-align: top; margin-top: 10px; display: inline-block; }
+    .plan-price sub { font-size: 15px; color: var(--muted); font-weight: 400; }
+    .plan-desc { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .plan-features li { font-size: 14px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+    .plan-features li::before { content: '✓'; color: var(--cyan); font-weight: 700; font-size: 13px; }
+    .plan-features li.muted { color: var(--muted); }
+    .plan-features li.muted::before { content: '–'; color: var(--muted); }
+    .btn-plan {
+      width: 100%; padding: 13px; border-radius: 10px;
+      font-family: var(--font-b); font-size: 15px; font-weight: 600;
+      cursor: pointer; border: none; transition: all .25s;
+    }
+    .btn-plan-primary { background: var(--cyan); color: #000; }
+    .btn-plan-primary:hover { background: #33eaff; box-shadow: 0 0 24px rgba(0,229,255,.4); }
+    .btn-plan-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-plan-outline:hover { border-color: rgba(255,255,255,.2); }
+
+    /* ─── TESTIMONIALS ─────────────────────────────────────── */
+    .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .review-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 24px;
+      transition: border-color .3s;
+    }
+    .review-card:hover { border-color: rgba(0,229,255,.2); }
+    .stars { color: #fbbf24; font-size: 14px; letter-spacing: 2px; margin-bottom: 14px; }
+    .review-text { font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 20px; font-style: italic; }
+    .reviewer { display: flex; align-items: center; gap: 12px; }
+    .reviewer-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-h); font-size: 15px; font-weight: 700; color: #000;
+      flex-shrink: 0;
+    }
+    .reviewer-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .reviewer-role { font-size: 12px; color: var(--muted); }
+
+    /* ─── FAQ ──────────────────────────────────────────────── */
+    .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .faq-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; transition: border-color .3s;
+    }
+    .faq-item.open { border-color: rgba(0,229,255,.2); }
+    .faq-q {
+      width: 100%; padding: 20px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: none; border: none; cursor: pointer;
+      text-align: left; color: var(--text); font-size: 15px; font-weight: 500;
+      font-family: var(--font-b);
+    }
+    .faq-icon {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+      color: var(--cyan); font-size: 18px; flex-shrink: 0;
+      transition: transform .3s, border-color .3s;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); border-color: var(--cyan); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height .4s ease, padding .3s;
+      font-size: 14px; color: var(--muted); line-height: 1.75;
+    }
+    .faq-item.open .faq-a { max-height: 200px; padding: 0 24px 20px; }
+
+    /* ─── CTA SECTION ──────────────────────────────────────── */
+    .cta-section { text-align: center; }
+    .cta-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px; padding: 80px 48px;
+      position: relative; overflow: hidden;
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 400px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    }
+    .cta-box::after {
+      content: '';
+      position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse, rgba(0,229,255,.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-title {
+      font-family: var(--font-h); font-size: clamp(30px, 4vw, 52px);
+      font-weight: 800; letter-spacing: -.03em; color: #fff;
+      margin: 16px 0 16px;
+    }
+    .cta-sub { font-size: 16px; color: var(--muted); margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .cta-form {
+      display: flex; gap: 12px; max-width: 440px; margin: 0 auto;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .cta-input {
+      flex: 1; min-width: 200px; padding: 13px 18px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 14px;
+      font-family: var(--font-b); outline: none; transition: border-color .2s;
+    }
+    .cta-input:focus { border-color: var(--cyan); }
+    .cta-input::placeholder { color: var(--muted); }
+    .cta-note { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+    /* ─── FOOTER ───────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 0 32px;
+    }
+    .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+    .footer-brand .logo { display: block; margin-bottom: 14px; }
+    .footer-desc { font-size: 13px; color: var(--muted); line-height: 1.7; max-width: 220px; }
+    .footer-col-title { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text); margin-bottom: 16px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-bottom {
+      border-top: 1px solid var(--border); padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--muted);
+    }
+    .footer-bottom a { color: var(--muted); text-decoration: none; }
+    .footer-bottom a:hover { color: var(--cyan); }
+
+    /* ─── SCROLL REVEAL ────────────────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── RESPONSIVE ───────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .features-grid, .reviews-grid { grid-template-columns: 1fr 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .steps::before { display: none; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+      .plan.popular { transform: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .features-grid, .reviews-grid, .steps { grid-template-columns: 1fr; }
+      .hero-stats { gap: 28px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+      .cta-box { padding: 48px 24px; }
+    }
+
+    /* Mobile nav */
+    .mobile-nav {
+      display: none; position: fixed; inset: 0; z-index: 99;
+      background: rgba(3,7,18,.97); backdrop-filter: blur(20px);
+      flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { font-family: var(--font-h); font-size: 28px; font-weight: 700; color: var(--text); text-decoration: none; }
+    .mobile-nav a:hover { color: var(--cyan); }
+    .close-btn { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--text); font-size: 28px; cursor: pointer; }
+  </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
-    <div class="max-w-2xl p-8 bg-[#161b22] border border-[#30363d] rounded-2xl shadow-xl text-center">
-        <h1 class="text-4xl font-bold text-[#58a6ff] mb-4">Roman Bochkov</h1>
-        <p class="text-lg text-[#8b949e] mb-6">Разработчик Python & C++ | Автоматизация | Олимпиадное программирование</p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div class="p-4 bg-[#0d1117] border border-[#30363d] rounded-lg">
-                <h3 class="font-semibold text-[#79c0ff]">Python / ADB</h3>
-                <p class="text-[#8b949e]">Автоматизация мобильных игр и эмуляторов</p>
-            </div>
-            <div class="p-4 bg-[#0d1117] border border-[#30363d] rounded-lg">
-                <h3 class="font-semibold text-[#79c0ff]">C++ / Algorithms</h3>
-                <p class="text-[#8b949e]">Решение сложных задач и олимпиадная база</p>
-            </div>
+<body>
+
+  <!-- ─── MOBILE NAV ─────────────────────────────────────── -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="close-btn" onclick="toggleMenu()">✕</button>
+    <a href="#features" onclick="toggleMenu()">Возможности</a>
+    <a href="#how" onclick="toggleMenu()">Как работает</a>
+    <a href="#pricing" onclick="toggleMenu()">Тарифы</a>
+    <a href="#reviews" onclick="toggleMenu()">Отзывы</a>
+    <a href="#cta" class="btn btn-primary" onclick="toggleMenu()">Начать бесплатно</a>
+  </div>
+
+  <!-- ─── HEADER ─────────────────────────────────────────── -->
+  <header id="header">
+    <div class="container">
+      <nav>
+        <a href="#" class="logo">Neuro<span>Pay</span></a>
+        <ul class="nav-links">
+          <li><a href="#features">Возможности</a></li>
+          <li><a href="#how">Как работает</a></li>
+          <li><a href="#pricing">Тарифы</a></li>
+          <li><a href="#reviews">Отзывы</a></li>
+        </ul>
+        <div style="display:flex;gap:12px;align-items:center">
+          <a href="#" class="btn btn-outline" style="display:none" id="desktopLogin">Войти</a>
+          <a href="#cta" class="btn btn-primary">Начать бесплатно <span class="arrow">→</span></a>
+          <button class="hamburger" onclick="toggleMenu()" aria-label="Меню">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ─── HERO ───────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container" style="position:relative;z-index:1;width:100%">
+      <div class="hero-content">
+        <div class="tag">🤖 AI-powered бухгалтерия</div>
+
+        <h1 class="hero-title">
+          Автоматизируй финансы<br>с помощью <span class="accent">нейросети</span>
+        </h1>
+
+        <p class="hero-sub">
+          NeuroPay анализирует ваши транзакции, ведёт учёт и сдаёт отчёты в налоговую — 
+          без бухгалтера, без ошибок, в режиме реального времени.
+        </p>
+
+        <div class="hero-cta">
+          <a href="#cta" class="btn btn-primary" style="font-size:16px;padding:14px 28px">
+            Попробовать 14 дней бесплатно <span class="arrow">→</span>
+          </a>
+          <a href="#how" class="btn btn-outline" style="font-size:16px;padding:14px 28px">
+            Как это работает
+          </a>
         </div>
 
-        <div class="mt-8 pt-6 border-t border-[#30363d]">
-            <p class="text-sm text-[#8b949e]">Здесь скоро появятся мои лучшие лендинги.</p>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-num">12<span>к+</span></div>
+            <div class="stat-label">Активных компаний</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">98<span>%</span></div>
+            <div class="stat-label">Точность распознавания</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">3<span>ч</span></div>
+            <div class="stat-label">Сэкономлено в день</div>
+          </div>
         </div>
+      </div>
+
+      <!-- Dashboard mockup -->
+      <div class="hero-visual">
+        <!-- Mini floating card 1 -->
+        <div class="mini-card card-1">
+          <div class="mc-icon" style="background:rgba(0,255,163,.1)">💳</div>
+          <div>
+            <div class="mc-top">Экономия в месяц</div>
+            <div class="mc-val" style="color:var(--green)">+48 200 ₽</div>
+          </div>
+        </div>
+
+        <!-- Main dashboard -->
+        <div class="dashboard-card">
+          <div class="d-header">
+            <div class="d-title">Обзор за июнь</div>
+            <div class="d-badge">● Синхронизировано</div>
+          </div>
+          <div class="d-amount">2 847 900 ₽</div>
+          <div class="d-delta">↑ +18.4% к прошлому месяцу</div>
+
+          <div class="mini-chart" id="miniChart"></div>
+
+          <div class="d-list">
+            <div class="d-list-item">
+              <div class="d-list-label"><span class="d-dot" style="background:var(--cyan)"></span>Выручка</div>
+              <div class="d-list-val">2 847 900 ₽</div>
+            </div>
+            <div class="d-list-item">
+              <div class="d-list-label"><span class="d-dot" style="background:var(--violet)"></span>Расходы</div>
+              <div class="d-list-val">1 124 400 ₽</div>
+            </div>
+            <div class="d-list-item">
+              <div class="d-list-label"><span class="d-dot" style="background:var(--green)"></span>Прибыль</div>
+              <div class="d-list-val" style="color:var(--green)">1 723 500 ₽</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mini floating card 2 -->
+        <div class="mini-card card-2">
+          <div class="mc-icon" style="background:rgba(124,58,237,.15)">🤖</div>
+          <div>
+            <div class="mc-top">AI выявил</div>
+            <div class="mc-val">3 дубля</div>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- ─── LOGOS ───────────────────────────────────────────── -->
+  <div class="logos-strip">
+    <div class="logos-label">Нам доверяют</div>
+    <div class="logos-track" id="logosTrack">
+      <span class="brand-name">Сбербанк</span>
+      <span class="brand-name">Яндекс</span>
+      <span class="brand-name">Тинькофф</span>
+      <span class="brand-name">Озон</span>
+      <span class="brand-name">ВКонтакте</span>
+      <span class="brand-name">МТС</span>
+      <span class="brand-name">Авито</span>
+      <span class="brand-name">HeadHunter</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="brand-name">Сбербанк</span>
+      <span class="brand-name">Яндекс</span>
+      <span class="brand-name">Тинькофф</span>
+      <span class="brand-name">Озон</span>
+      <span class="brand-name">ВКонтакте</span>
+      <span class="brand-name">МТС</span>
+      <span class="brand-name">Авито</span>
+      <span class="brand-name">HeadHunter</span>
+    </div>
+  </div>
+
+  <!-- ─── FEATURES ────────────────────────────────────────── -->
+  <section id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="tag">Возможности</div>
+        <h2 class="section-title">Всё что нужно<br>для умного учёта</h2>
+        <p class="section-sub">Забудьте про Excel и ручной ввод. AI делает всё за вас.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">🧠</div>
+          <div class="feature-title">Умная категоризация</div>
+          <p class="feature-text">AI автоматически распределяет каждую транзакцию по статьям расходов с точностью 98%. Никаких ручных пометок.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">Отчёты в 1 клик</div>
+          <p class="feature-text">Баланс, P&L, движение денег — любой отчёт готов мгновенно. Экспорт в PDF, Excel или прямо в налоговую.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🔗</div>
+          <div class="feature-title">Интеграция с банками</div>
+          <p class="feature-text">Подключите Сбер, Тинькофф, Альфа, ВТБ и ещё 40+ банков. Транзакции синхронизируются автоматически.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Налоговый советник</div>
+          <p class="feature-text">AI прогнозирует налоговую нагрузку и подсказывает законные способы оптимизации. Всегда в курсе изменений закона.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-title">Банковская защита</div>
+          <p class="feature-text">256-bit шифрование, двухфакторная аутентификация, сертификат ФСТЭК. Ваши данные надёжно защищены.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📱</div>
+          <div class="feature-title">Мобильный доступ</div>
+          <p class="feature-text">Контролируйте финансы с телефона. Push-уведомления о важных событиях, голосовые запросы к AI-ассистенту.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HOW IT WORKS ─────────────────────────────────────── -->
+  <section id="how" class="how-bg">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="tag">Процесс</div>
+        <h2 class="section-title">Запуск за 4 шага</h2>
+        <p class="section-sub">От регистрации до первого отчёта — меньше 15 минут.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">01</div>
+          <div class="step-title">Регистрация</div>
+          <p class="step-text">Создайте аккаунт за 30 секунд. Никаких документов, только email и пароль.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">02</div>
+          <div class="step-title">Подключите банк</div>
+          <p class="step-text">Выберите банк из списка, авторизуйтесь через Open Banking API. Данные появятся мгновенно.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">03</div>
+          <div class="step-title">AI анализирует</div>
+          <p class="step-text">Нейросеть изучает историю транзакций, обучается под ваш бизнес и строит модель.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">04</div>
+          <div class="step-title">Готово!</div>
+          <p class="step-text">Управляйте финансами в реальном времени. AI сам напомнит про налоги и важные даты.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PRICING ──────────────────────────────────────────── -->
+  <section id="pricing">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="tag">Тарифы</div>
+        <h2 class="section-title">Честная цена</h2>
+        <p class="section-sub">14 дней бесплатно на любом тарифе. Без привязки карты.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <!-- Starter -->
+        <div class="plan reveal">
+          <div class="plan-name">Старт</div>
+          <div class="plan-price"><sup>₽</sup>990<sub>/мес</sub></div>
+          <p class="plan-desc">Для ИП и малого бизнеса</p>
+          <ul class="plan-features">
+            <li>1 расчётный счёт</li>
+            <li>До 200 транзакций/мес</li>
+            <li>Базовые отчёты</li>
+            <li>Email поддержка</li>
+            <li class="muted">AI-советник</li>
+            <li class="muted">API доступ</li>
+          </ul>
+          <button class="btn-plan btn-plan-outline">Начать бесплатно</button>
+        </div>
+
+        <!-- Pro -->
+        <div class="plan popular reveal">
+          <div class="popular-badge">Популярный</div>
+          <div class="plan-name">Про</div>
+          <div class="plan-price"><sup>₽</sup>2 490<sub>/мес</sub></div>
+          <p class="plan-desc">Для растущих компаний</p>
+          <ul class="plan-features">
+            <li>До 5 счетов</li>
+            <li>Безлимит транзакций</li>
+            <li>Полная отчётность</li>
+            <li>Приоритетный чат</li>
+            <li>AI-советник включён</li>
+            <li class="muted">API доступ</li>
+          </ul>
+          <button class="btn-plan btn-plan-primary">Начать бесплатно</button>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="plan reveal">
+          <div class="plan-name">Бизнес</div>
+          <div class="plan-price"><sup>₽</sup>6 990<sub>/мес</sub></div>
+          <p class="plan-desc">Для компаний и холдингов</p>
+          <ul class="plan-features">
+            <li>Неограниченно счетов</li>
+            <li>Безлимит транзакций</li>
+            <li>Кастомные отчёты</li>
+            <li>Выделенный менеджер</li>
+            <li>AI-советник включён</li>
+            <li>Полный API доступ</li>
+          </ul>
+          <button class="btn-plan btn-plan-outline">Связаться с нами</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── REVIEWS ──────────────────────────────────────────── -->
+  <section id="reviews" class="how-bg">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="tag">Отзывы</div>
+        <h2 class="section-title">12 000+ компаний<br>уже экономят время</h2>
+      </div>
+
+      <div class="reviews-grid">
+        <div class="review-card reveal">
+          <div class="stars">★★★★★</div>
+          <p class="review-text">«Раньше тратил 3 часа в неделю на сведение счетов. Теперь вся бухгалтерия — 10 минут. NeuroPay буквально окупился за первую неделю.»</p>
+          <div class="reviewer">
+            <div class="reviewer-avatar" style="background:var(--cyan)">АК</div>
+            <div>
+              <div class="reviewer-name">Алексей Крылов</div>
+              <div class="reviewer-role">Founder, DevStudio</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card reveal">
+          <div class="stars">★★★★★</div>
+          <p class="review-text">«Наконец-то бухгалтерия, которую понимает предприниматель, а не только бухгалтер. Отчёты читаемые, советы — дельные.»</p>
+          <div class="reviewer">
+            <div class="reviewer-avatar" style="background:var(--violet)">МС</div>
+            <div>
+              <div class="reviewer-name">Мария Соколова</div>
+              <div class="reviewer-role">CEO, FashionBrand</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card reveal">
+          <div class="stars">★★★★★</div>
+          <p class="review-text">«AI поймал дублирующиеся платежи на 140 000 ₽ за первый месяц. Сервис окупил себя в 50 раз. Рекомендую всем.»</p>
+          <div class="reviewer">
+            <div class="reviewer-avatar" style="background:var(--green);color:#000">ДВ</div>
+            <div>
+              <div class="reviewer-name">Дмитрий Волков</div>
+              <div class="reviewer-role">CFO, LogisTech</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FAQ ─────────────────────────────────────────────── -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="tag">Вопросы</div>
+        <h2 class="section-title">Часто спрашивают</h2>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Нужен ли бухгалтер при использовании NeuroPay?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Для большинства ИП и малого бизнеса — нет. NeuroPay полностью автоматизирует рутинный учёт, формирует отчёты и напоминает о сроках. Для сложных случаев (ООО, НДС) рекомендуем консультацию раз в квартал.</div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Насколько безопасно подключать банк?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Мы используем Open Banking API — стандарт, который применяют крупнейшие банки мира. NeuroPay получает только доступ на чтение операций. Перевести деньги или изменить реквизиты через нас невозможно технически.</div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Что будет по истечении 14 дней?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Мы отправим напоминание за 3 дня. Вы сами выберете подходящий тариф. Если не выберете — аккаунт перейдёт в режим «только чтение», ваши данные сохранятся на 30 дней.</div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Работает ли NeuroPay с иностранными счетами?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Да, поддерживаем счета в EUR, USD, AED, KZT. Автоматически пересчитываем по курсу ЦБ на дату операции. Отчёты формируются в рублях и валюте счёта.</div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Можно ли перенести данные из 1С или другой системы?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Да. Поддерживаем импорт из 1С, Excel, CSV и большинства популярных систем. Наша команда поможет с миграцией бесплатно на тарифе «Бизнес».</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ──────────────────────────────────────────────── -->
+  <section id="cta">
+    <div class="container">
+      <div class="cta-box reveal">
+        <div class="tag">Начните сегодня</div>
+        <h2 class="cta-title">Первые 14 дней<br>— бесплатно</h2>
+        <p class="cta-sub">Никакой карты. Никаких обязательств. Просто попробуйте и убедитесь сами.</p>
+        <div class="cta-form">
+          <input class="cta-input" type="email" placeholder="ваш@email.ru" id="ctaEmail" />
+          <button class="btn btn-primary" style="font-size:15px;padding:13px 24px" onclick="handleCta()">
+            Начать бесплатно →
+          </button>
+        </div>
+        <p class="cta-note">✓ Без карты &nbsp;&nbsp; ✓ 14 дней бесплатно &nbsp;&nbsp; ✓ Отмена в 1 клик</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ───────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">Neuro<span>Pay</span></a>
+          <p class="footer-desc">AI-платформа для автоматизации бухгалтерии малого и среднего бизнеса.</p>
+        </div>
+        <div>
+          <div class="footer-col-title">Продукт</div>
+          <ul class="footer-links">
+            <li><a href="#">Возможности</a></li>
+            <li><a href="#">Интеграции</a></li>
+            <li><a href="#">Тарифы</a></li>
+            <li><a href="#">API</a></li>
+            <li><a href="#">Обновления</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Компания</div>
+          <ul class="footer-links">
+            <li><a href="#">О нас</a></li>
+            <li><a href="#">Блог</a></li>
+            <li><a href="#">Карьера</a></li>
+            <li><a href="#">Партнёрам</a></li>
+            <li><a href="#">Контакты</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Поддержка</div>
+          <ul class="footer-links">
+            <li><a href="#">Документация</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Статус сервиса</a></li>
+            <li><a href="#">help@neuropay.ru</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 NeuroPay. Все права защищены.</span>
+        <div style="display:flex;gap:24px">
+          <a href="#">Политика конфиденциальности</a>
+          <a href="#">Пользовательское соглашение</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── JAVASCRIPT ─────────────────────────────────────── -->
+  <script>
+    // ── Sticky header ──────────────────────────────────────
+    const header = document.getElementById('header');
+    const desktopLogin = document.getElementById('desktopLogin');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 60) {
+        header.classList.add('scrolled');
+        desktopLogin.style.display = 'flex';
+      } else {
+        header.classList.remove('scrolled');
+        desktopLogin.style.display = 'none';
+      }
+    });
+
+    // ── Mobile menu ─────────────────────────────────────────
+    function toggleMenu() {
+      document.getElementById('mobileNav').classList.toggle('open');
+      document.body.style.overflow = document.getElementById('mobileNav').classList.contains('open') ? 'hidden' : '';
+    }
+
+    // ── Build mini bar chart ─────────────────────────────────
+    const bars = [35, 55, 45, 70, 60, 85, 65, 90, 75, 80, 95, 88];
+    const chart = document.getElementById('miniChart');
+    bars.forEach((h, i) => {
+      const bar = document.createElement('div');
+      bar.className = 'bar' + (i === bars.length - 1 ? ' active' : '');
+      bar.style.height = h + '%';
+      bar.style.animationDelay = (i * 0.05) + 's';
+      chart.appendChild(bar);
+    });
+
+    // ── Scroll reveal ────────────────────────────────────────
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // Stagger siblings
+          const siblings = entry.target.parentElement.querySelectorAll('.reveal');
+          let delay = 0;
+          siblings.forEach((sib, idx) => {
+            if (sib === entry.target) delay = idx * 80;
+          });
+          setTimeout(() => entry.target.classList.add('visible'), delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(el => observer.observe(el));
+
+    // ── FAQ accordion ────────────────────────────────────────
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      // Close all
+      document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+      // Open clicked if it was closed
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // ── CTA form ─────────────────────────────────────────────
+    function handleCta() {
+      const email = document.getElementById('ctaEmail').value.trim();
+      if (!email || !email.includes('@')) {
+        document.getElementById('ctaEmail').style.borderColor = '#ef4444';
+        setTimeout(() => document.getElementById('ctaEmail').style.borderColor = '', 1500);
+        return;
+      }
+      const btn = event.target;
+      btn.textContent = '✓ Отправлено!';
+      btn.style.background = 'var(--green)';
+      btn.style.pointerEvents = 'none';
+    }
+
+    // ── Smooth active nav highlight ──────────────────────────
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.id;
+      });
+      navLinks.forEach(link => {
+        link.style.color = link.getAttribute('href') === '#' + current ? 'var(--text)' : '';
+      });
+    });
+  </script>
 </body>
 </html>

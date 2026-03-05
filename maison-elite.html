@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maison Élite — Консьерж-сервис высшего уровня</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET ────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #080808;
+      --deep:    #0e0c0a;
+      --card:    #131210;
+      --gold:    #c9a96e;
+      --gold-lt: #e8d5a3;
+      --gold-dk: #8b6b3d;
+      --cream:   #f5f0e8;
+      --text:    #d4c9b5;
+      --muted:   #6b6357;
+      --border:  rgba(201,169,110,0.15);
+      --font-d:  'Cormorant Garamond', serif;
+      --font-b:  'Montserrat', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: var(--font-b);
+      font-size: 15px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─── CUSTOM CURSOR ────────────────────────────────────── */
+    .cursor {
+      position: fixed; width: 8px; height: 8px;
+      background: var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform .1s, width .3s, height .3s, opacity .3s;
+    }
+    .cursor-ring {
+      position: fixed; width: 36px; height: 36px;
+      border: 1px solid rgba(201,169,110,.4); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform .12s ease, width .3s, height .3s, border-color .3s;
+    }
+    body:hover .cursor { opacity: 1; }
+    a:hover ~ .cursor, button:hover ~ .cursor { width: 14px; height: 14px; }
+
+    /* ─── NOISE TEXTURE ────────────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      opacity: .6;
+    }
+
+    /* ─── UTILITY ──────────────────────────────────────────── */
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 40px; }
+
+    .gold-line {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--font-b); font-size: 10px; font-weight: 500;
+      letter-spacing: .2em; text-transform: uppercase; color: var(--gold);
+    }
+    .gold-line::before, .gold-line::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dk));
+    }
+    .gold-line::after { background: linear-gradient(90deg, var(--gold-dk), transparent); }
+
+    .section-eyebrow {
+      font-family: var(--font-b); font-size: 10px; font-weight: 500;
+      letter-spacing: .25em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 20px; display: block;
+    }
+    .section-title {
+      font-family: var(--font-d); font-size: clamp(38px, 5vw, 68px);
+      font-weight: 300; line-height: 1.1; color: var(--cream);
+      letter-spacing: -.01em;
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+    .section-sub {
+      font-size: 13px; font-weight: 300; color: var(--muted);
+      line-height: 1.9; max-width: 420px; margin-top: 20px;
+      letter-spacing: .02em;
+    }
+
+    .btn-gold {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-family: var(--font-b); font-size: 10px; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--black); background: var(--gold);
+      padding: 16px 36px; border: none; cursor: none;
+      text-decoration: none; position: relative; overflow: hidden;
+      transition: all .4s;
+    }
+    .btn-gold::before {
+      content: ''; position: absolute; inset: 0;
+      background: var(--gold-lt); transform: translateX(-101%);
+      transition: transform .4s ease;
+    }
+    .btn-gold:hover::before { transform: translateX(0); }
+    .btn-gold span { position: relative; z-index: 1; }
+
+    .btn-outline-gold {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-family: var(--font-b); font-size: 10px; font-weight: 500;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--gold); background: transparent;
+      padding: 15px 35px; border: 1px solid var(--border);
+      cursor: none; text-decoration: none; transition: all .3s;
+    }
+    .btn-outline-gold:hover { border-color: var(--gold); color: var(--cream); }
+
+    /* ─── HEADER ───────────────────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 28px 0;
+      transition: padding .4s, background .4s, border-color .4s;
+      border-bottom: 1px solid transparent;
+    }
+    header.scrolled {
+      padding: 18px 0;
+      background: rgba(8,8,8,.92);
+      backdrop-filter: blur(24px);
+      border-color: var(--border);
+    }
+    nav { display: flex; align-items: center; justify-content: space-between; }
+    .logo {
+      font-family: var(--font-d); font-size: 26px; font-weight: 400;
+      color: var(--cream); text-decoration: none; letter-spacing: .05em;
+    }
+    .logo em { font-style: italic; color: var(--gold); }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-b); font-size: 10px; font-weight: 500;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color .3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta {
+      font-family: var(--font-b); font-size: 10px; font-weight: 500;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--border);
+      padding-bottom: 2px; transition: border-color .3s;
+    }
+    .nav-cta:hover { border-color: var(--gold); }
+    .hamburger { display: none; flex-direction: column; gap: 6px; cursor: none; background: none; border: none; }
+    .hamburger span { width: 22px; height: 1px; background: var(--gold); transition: all .3s; }
+
+    /* ─── MOBILE NAV ───────────────────────────────────────── */
+    .mobile-nav {
+      display: none; position: fixed; inset: 0; z-index: 99;
+      background: rgba(8,8,8,.98); backdrop-filter: blur(30px);
+      flex-direction: column; align-items: center; justify-content: center; gap: 40px;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: var(--font-d); font-size: 36px; font-weight: 300;
+      color: var(--cream); text-decoration: none; letter-spacing: .05em;
+      transition: color .3s;
+    }
+    .mobile-nav a:hover { color: var(--gold); }
+    .mobile-close {
+      position: absolute; top: 28px; right: 40px;
+      background: none; border: none; color: var(--muted);
+      font-size: 20px; cursor: none; font-family: var(--font-d);
+      letter-spacing: .1em;
+    }
+
+    /* ─── HERO ─────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh; display: flex; align-items: flex-end;
+      padding-bottom: 80px; position: relative; overflow: hidden;
+    }
+
+    /* Hero background — layered dark with vignette */
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 70% 40%, rgba(201,169,110,.04) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 60% at 20% 80%, rgba(139,107,61,.06) 0%, transparent 50%),
+        linear-gradient(160deg, #0e0b08 0%, #080808 50%, #0a0a08 100%);
+    }
+
+    /* Decorative vertical golden line */
+    .hero-line {
+      position: absolute; top: 0; left: 50%; width: 1px; height: 100%;
+      background: linear-gradient(180deg, transparent, rgba(201,169,110,.15), transparent);
+    }
+
+    /* Large ghost serif */
+    .hero-ghost {
+      position: absolute; right: -40px; top: 50%; transform: translateY(-50%);
+      font-family: var(--font-d); font-size: clamp(180px, 20vw, 320px);
+      font-weight: 300; color: transparent;
+      -webkit-text-stroke: 1px rgba(201,169,110,.06);
+      pointer-events: none; white-space: nowrap; line-height: 1;
+      letter-spacing: -.04em;
+    }
+
+    /* Roman numeral decorations */
+    .roman {
+      position: absolute; font-family: var(--font-d); font-size: 11px;
+      color: var(--muted); letter-spacing: .2em; text-transform: uppercase;
+    }
+    .roman-1 { top: 140px; right: 40px; writing-mode: vertical-lr; }
+    .roman-2 { bottom: 80px; left: 40px; }
+
+    .hero-content {
+      position: relative; z-index: 2; max-width: 680px;
+    }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--font-b); font-size: 10px; font-weight: 500;
+      letter-spacing: .25em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 36px; animation: fadeUp .8s ease both;
+    }
+    .hero-eyebrow::before { content: ''; width: 40px; height: 1px; background: var(--gold-dk); }
+
+    .hero-title {
+      font-family: var(--font-d); font-size: clamp(52px, 7vw, 104px);
+      font-weight: 300; line-height: 1.0; color: var(--cream);
+      letter-spacing: -.02em; margin-bottom: 36px;
+      animation: fadeUp .8s .1s ease both;
+    }
+    .hero-title em { font-style: italic; display: block; color: var(--gold); }
+
+    .hero-desc {
+      font-size: 13px; font-weight: 300; color: var(--muted);
+      line-height: 2; max-width: 400px; margin-bottom: 48px;
+      letter-spacing: .02em; animation: fadeUp .8s .2s ease both;
+    }
+
+    .hero-buttons {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      animation: fadeUp .8s .3s ease both;
+    }
+
+    /* Hero right panel */
+    .hero-panel {
+      position: absolute; right: 80px; bottom: 80px; z-index: 2;
+      display: flex; flex-direction: column; gap: 1px;
+      animation: fadeUp .8s .5s ease both;
+    }
+    @media (max-width: 960px) { .hero-panel { display: none; } }
+    .panel-stat {
+      padding: 20px 28px; border: 1px solid var(--border);
+      background: rgba(14,12,10,.6); backdrop-filter: blur(10px);
+      min-width: 180px;
+    }
+    .panel-stat:first-child { border-bottom: none; }
+    .panel-num {
+      font-family: var(--font-d); font-size: 38px; font-weight: 300;
+      color: var(--cream); line-height: 1;
+    }
+    .panel-num sup { font-size: 18px; vertical-align: top; margin-top: 6px; display: inline-block; color: var(--gold); }
+    .panel-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      font-size: 9px; letter-spacing: .25em; text-transform: uppercase;
+      color: var(--muted); animation: fadeUp 1s .8s ease both; z-index: 2;
+    }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(180deg, var(--gold-dk), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+
+    /* ─── SERVICES ─────────────────────────────────────────── */
+    section { padding: 120px 0; position: relative; }
+
+    .services-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); margin-top: 64px; }
+    .service-item {
+      background: var(--deep);
+      padding: 52px 48px;
+      position: relative; overflow: hidden;
+      transition: background .4s;
+    }
+    .service-item::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dk), transparent);
+      opacity: 0; transition: opacity .4s;
+    }
+    .service-item:hover { background: #111009; }
+    .service-item:hover::after { opacity: 1; }
+
+    .service-num {
+      font-family: var(--font-d); font-size: 13px; color: var(--gold-dk);
+      letter-spacing: .1em; margin-bottom: 28px;
+    }
+    .service-icon { font-size: 28px; margin-bottom: 20px; display: block; }
+    .service-title {
+      font-family: var(--font-d); font-size: 28px; font-weight: 400;
+      color: var(--cream); margin-bottom: 14px; line-height: 1.2;
+    }
+    .service-text { font-size: 13px; color: var(--muted); line-height: 1.9; font-weight: 300; }
+    .service-link {
+      display: inline-flex; align-items: center; gap: 10px; margin-top: 24px;
+      font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--gold); text-decoration: none;
+      border-bottom: 1px solid transparent; padding-bottom: 2px;
+      transition: border-color .3s, gap .3s;
+    }
+    .service-link:hover { border-color: var(--gold-dk); gap: 16px; }
+
+    /* ─── PHILOSOPHY / ABOUT ───────────────────────────────── */
+    .philosophy { background: var(--deep); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .philosophy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 120px; align-items: center; }
+    .philosophy-visual {
+      position: relative; aspect-ratio: 3/4; max-height: 560px;
+    }
+    .phil-rect {
+      position: absolute; border: 1px solid var(--border);
+    }
+    .phil-rect-1 { inset: 0; background: linear-gradient(135deg, #1a1610, #0e0c0a); }
+    .phil-rect-2 { top: 24px; left: 24px; right: -24px; bottom: -24px; background: transparent; }
+    .phil-center {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+    }
+    .phil-roman {
+      font-family: var(--font-d); font-size: 96px; font-weight: 300;
+      color: transparent; -webkit-text-stroke: 1px rgba(201,169,110,.2);
+      line-height: 1;
+    }
+    .phil-year {
+      font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--gold); text-align: center;
+    }
+    .phil-divider { width: 40px; height: 1px; background: var(--gold-dk); }
+
+    .philosophy-text blockquote {
+      font-family: var(--font-d); font-size: clamp(22px, 3vw, 36px);
+      font-weight: 300; font-style: italic; color: var(--cream);
+      line-height: 1.4; margin-bottom: 32px;
+      border-left: 1px solid var(--gold-dk); padding-left: 28px;
+    }
+    .philosophy-text p {
+      font-size: 13px; font-weight: 300; color: var(--muted);
+      line-height: 2; margin-bottom: 16px; letter-spacing: .02em;
+    }
+    .signature {
+      font-family: var(--font-d); font-size: 28px; font-style: italic;
+      color: var(--gold); margin-top: 32px; display: block;
+    }
+
+    /* ─── PROCESS ──────────────────────────────────────────── */
+    .process-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 80px; position: relative; }
+    .process-steps::before {
+      content: ''; position: absolute; top: 20px; left: 12.5%; right: 12.5%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), var(--gold-dk), var(--border), transparent);
+    }
+    .p-step { padding: 0 24px 48px; text-align: center; }
+    .p-num {
+      width: 40px; height: 40px; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-d); font-size: 16px; color: var(--gold);
+      margin: 0 auto 28px; background: var(--black); position: relative; z-index: 1;
+    }
+    .p-title { font-family: var(--font-d); font-size: 22px; color: var(--cream); margin-bottom: 12px; }
+    .p-text { font-size: 12px; color: var(--muted); line-height: 1.9; font-weight: 300; }
+
+    /* ─── TESTIMONIALS ─────────────────────────────────────── */
+    .testi-section { background: var(--deep); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-top: 64px; }
+    .testi-card {
+      background: var(--deep); padding: 48px 40px;
+      transition: background .3s;
+    }
+    .testi-card:hover { background: #111009; }
+    .testi-stars { color: var(--gold); font-size: 13px; letter-spacing: 4px; margin-bottom: 24px; }
+    .testi-text {
+      font-family: var(--font-d); font-size: 19px; font-weight: 300; font-style: italic;
+      color: var(--cream); line-height: 1.65; margin-bottom: 28px;
+    }
+    .testi-divider { width: 32px; height: 1px; background: var(--gold-dk); margin-bottom: 24px; }
+    .testi-author { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+    .testi-role { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: .05em; }
+
+    /* ─── FAQ ──────────────────────────────────────────────── */
+    .faq-container { max-width: 760px; margin: 64px auto 0; }
+    .faq-item {
+      border-bottom: 1px solid var(--border); overflow: hidden;
+    }
+    .faq-q {
+      width: 100%; padding: 28px 0;
+      display: flex; justify-content: space-between; align-items: center;
+      background: none; border: none; cursor: none; text-align: left;
+      font-family: var(--font-d); font-size: 20px; font-weight: 300;
+      color: var(--cream); letter-spacing: .01em;
+      transition: color .3s;
+    }
+    .faq-q:hover { color: var(--gold); }
+    .faq-icon {
+      width: 28px; height: 28px; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gold); font-size: 18px; flex-shrink: 0; margin-left: 24px;
+      transition: transform .4s, border-color .3s;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); border-color: var(--gold-dk); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height .5s ease, padding .4s;
+      font-size: 13px; color: var(--muted); line-height: 2; font-weight: 300;
+    }
+    .faq-item.open .faq-a { max-height: 200px; padding-bottom: 28px; }
+
+    /* ─── CTA ──────────────────────────────────────────────── */
+    .cta-section {
+      min-height: 60vh; display: flex; align-items: center;
+      background: var(--deep);
+      border-top: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .cta-ornament {
+      position: absolute; font-family: var(--font-d); font-size: 400px;
+      font-weight: 300; color: transparent;
+      -webkit-text-stroke: 1px rgba(201,169,110,.03);
+      pointer-events: none; right: -80px; top: 50%; transform: translateY(-50%);
+      line-height: 1;
+    }
+    .cta-content { position: relative; z-index: 1; max-width: 600px; }
+    .cta-title {
+      font-family: var(--font-d); font-size: clamp(42px, 6vw, 80px);
+      font-weight: 300; line-height: 1.05; color: var(--cream);
+      margin: 24px 0 24px;
+    }
+    .cta-title em { font-style: italic; color: var(--gold); }
+    .cta-text { font-size: 13px; color: var(--muted); line-height: 2; font-weight: 300; margin-bottom: 48px; }
+    .cta-form { display: flex; gap: 0; max-width: 480px; }
+    .cta-input {
+      flex: 1; padding: 16px 24px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border); border-right: none;
+      color: var(--text); font-family: var(--font-b); font-size: 13px;
+      outline: none; transition: border-color .3s; letter-spacing: .02em;
+    }
+    .cta-input:focus { border-color: var(--gold-dk); }
+    .cta-input::placeholder { color: var(--muted); }
+
+    /* ─── FOOTER ───────────────────────────────────────────── */
+    footer {
+      background: var(--black);
+      border-top: 1px solid var(--border);
+      padding: 64px 0 40px;
+    }
+    .footer-top { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 56px; }
+    .f-logo {
+      font-family: var(--font-d); font-size: 28px; font-weight: 300;
+      color: var(--cream); text-decoration: none; display: block; margin-bottom: 20px;
+    }
+    .f-logo em { font-style: italic; color: var(--gold); }
+    .f-desc { font-size: 12px; color: var(--muted); line-height: 2; font-weight: 300; max-width: 240px; }
+    .f-heading {
+      font-size: 10px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 20px;
+    }
+    .f-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .f-links a {
+      font-size: 12px; color: var(--muted); text-decoration: none;
+      letter-spacing: .04em; transition: color .3s;
+    }
+    .f-links a:hover { color: var(--gold); }
+    .footer-bottom {
+      border-top: 1px solid var(--border); padding-top: 32px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-bottom p { font-size: 11px; color: var(--muted); letter-spacing: .06em; }
+    .footer-bottom a { color: var(--muted); text-decoration: none; transition: color .3s; }
+    .footer-bottom a:hover { color: var(--gold); }
+    .footer-links-row { display: flex; gap: 32px; }
+
+    /* ─── REVEAL ANIMATION ─────────────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-left { opacity: 0; transform: translateX(-30px); transition: opacity .8s ease, transform .8s ease; }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right { opacity: 0; transform: translateX(30px); transition: opacity .8s ease, transform .8s ease; }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── RESPONSIVE ───────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .philosophy-grid { grid-template-columns: 1fr; gap: 60px; }
+      .philosophy-visual { max-height: 320px; }
+      .services-layout { grid-template-columns: 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .process-steps::before { display: none; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      body { cursor: auto; }
+      .cursor, .cursor-ring { display: none; }
+      .container { padding: 0 20px; }
+      section { padding: 80px 0; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .process-steps { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .footer-links-row { flex-wrap: wrap; justify-content: center; gap: 16px; }
+      .cta-form { flex-direction: column; }
+      .cta-input { border-right: 1px solid var(--border); border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── CUSTOM CURSOR ──────────────────────────────────── -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ─── MOBILE NAV ────────────────────────────────────── -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="mobile-close" onclick="toggleMenu()">Закрыть</button>
+    <a href="#services" onclick="toggleMenu()">Услуги</a>
+    <a href="#philosophy" onclick="toggleMenu()">О нас</a>
+    <a href="#process" onclick="toggleMenu()">Процесс</a>
+    <a href="#reviews" onclick="toggleMenu()">Отзывы</a>
+    <a href="#contact" onclick="toggleMenu()">Связаться</a>
+  </div>
+
+  <!-- ─── HEADER ────────────────────────────────────────── -->
+  <header id="header">
+    <div class="container">
+      <nav>
+        <a href="#" class="logo">Maison <em>Élite</em></a>
+        <ul class="nav-links">
+          <li><a href="#services">Услуги</a></li>
+          <li><a href="#philosophy">О нас</a></li>
+          <li><a href="#process">Процесс</a></li>
+          <li><a href="#reviews">Отзывы</a></li>
+        </ul>
+        <div style="display:flex;align-items:center;gap:24px">
+          <a href="#contact" class="nav-cta">Персональная консультация</a>
+          <button class="hamburger" onclick="toggleMenu()">
+            <span></span><span></span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ─── HERO ──────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-line"></div>
+    <div class="hero-ghost">M</div>
+    <div class="roman roman-1">Консьерж — Люкс — Эксклюзив</div>
+    <div class="roman roman-2">Est. MMXV · Москва · Монако · Дубай</div>
+
+    <div class="container" style="position:relative;z-index:2;width:100%">
+      <div class="hero-content">
+        <div class="hero-eyebrow">Консьерж-сервис высшего уровня</div>
+
+        <h1 class="hero-title">
+          Жизнь без<br>
+          <em>компромиссов</em>
+        </h1>
+
+        <p class="hero-desc">
+          Мы организуем то, что другие считают невозможным. Частные яхты, виллы, 
+          закрытые мероприятия — с нами каждая деталь безупречна.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="#contact" class="btn-gold"><span>Начать сотрудничество</span> <span>→</span></a>
+          <a href="#services" class="btn-outline-gold"><span>Наши услуги</span></a>
+        </div>
+      </div>
+
+      <!-- Stats panel -->
+      <div class="hero-panel">
+        <div class="panel-stat">
+          <div class="panel-num">10<sup>+</sup></div>
+          <div class="panel-label">Лет безупречного сервиса</div>
+        </div>
+        <div class="panel-stat">
+          <div class="panel-num">1<sup>к</sup></div>
+          <div class="panel-label">Состоятельных клиентов</div>
+        </div>
+        <div class="panel-stat">
+          <div class="panel-num">24<sup>/7</sup></div>
+          <div class="panel-label">Персональный менеджер</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Прокрутите</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ─── GOLD LINE ─────────────────────────────────────── -->
+  <div style="padding:0;border-top:1px solid var(--border)">
+    <div class="container" style="padding-top:40px;padding-bottom:40px">
+      <div class="gold-line">Эксклюзивный доступ к лучшему</div>
+    </div>
+  </div>
+
+  <!-- ─── SERVICES ──────────────────────────────────────── -->
+  <section id="services" style="padding-top:80px">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-eyebrow">Наши услуги</span>
+        <h2 class="section-title">Исключительный<br><em>сервис</em> для вас</h2>
+        <p class="section-sub">Каждый запрос — особый. Мы создаём опыт, который невозможно повторить.</p>
+      </div>
+
+      <div class="services-layout">
+        <div class="service-item reveal">
+          <div class="service-num">I</div>
+          <span class="service-icon">⛵</span>
+          <div class="service-title">Частные яхты<br>и морские путешествия</div>
+          <p class="service-text">Флот из более 200 яхт по всему миру. От дневных прогулок по Средиземноморью до кругосветных экспедиций с командой профессионалов.</p>
+          <a href="#" class="service-link">Подробнее →</a>
+        </div>
+
+        <div class="service-item reveal">
+          <div class="service-num">II</div>
+          <span class="service-icon">🏛</span>
+          <div class="service-title">Виллы и<br>резиденции</div>
+          <p class="service-text">Тщательно отобранные виллы в Монако, Сен-Тропе, Дубае, Мальдивах. Только те объекты, которые мы посетили лично.</p>
+          <a href="#" class="service-link">Подробнее →</a>
+        </div>
+
+        <div class="service-item reveal">
+          <div class="service-num">III</div>
+          <span class="service-icon">✈️</span>
+          <div class="service-title">Частная авиация<br>и вертолёты</div>
+          <p class="service-text">Вылет в течение 4 часов из любой точки мира. Индивидуальный подбор воздушного судна под ваши задачи и предпочтения.</p>
+          <a href="#" class="service-link">Подробнее →</a>
+        </div>
+
+        <div class="service-item reveal">
+          <div class="service-num">IV</div>
+          <span class="service-icon">🎭</span>
+          <div class="service-title">Закрытые события<br>и мероприятия</div>
+          <p class="service-text">Гала-ужины, частные показы, VIP-ложи на Formula 1 и Каннском фестивале. Доступ туда, куда не попасть без нас.</p>
+          <a href="#" class="service-link">Подробнее →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PHILOSOPHY ────────────────────────────────────── -->
+  <section id="philosophy" class="philosophy">
+    <div class="container">
+      <div class="philosophy-grid">
+        <div class="philosophy-visual reveal-left">
+          <div class="phil-rect phil-rect-2"></div>
+          <div class="phil-rect phil-rect-1">
+            <div class="phil-center">
+              <div class="phil-roman">X</div>
+              <div class="phil-divider"></div>
+              <div class="phil-year">Десять лет безупречности</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="philosophy-text reveal-right">
+          <span class="section-eyebrow">Наша философия</span>
+          <blockquote>
+            «Роскошь — это не цена. Это ощущение, что о вас позаботились в каждой детали.»
+          </blockquote>
+          <p>Maison Élite основана в 2015 году командой, которая сама жила среди клиентов подобных сервисов. Мы знаем изнутри, что значит «безупречно».</p>
+          <p>Каждый клиент получает персонального менеджера, который доступен 24 часа 7 дней в неделю. Не чат-бот. Не колл-центр. Живой человек, который помнит ваши предпочтения.</p>
+          <span class="signature">— Александр Морозов, основатель</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PROCESS ───────────────────────────────────────── -->
+  <section id="process">
+    <div class="container">
+      <div class="section-header reveal" style="text-align:center">
+        <span class="section-eyebrow">Как это работает</span>
+        <h2 class="section-title">Четыре шага<br>к <em>идеальному</em> опыту</h2>
+      </div>
+
+      <div class="process-steps">
+        <div class="p-step reveal">
+          <div class="p-num">I</div>
+          <div class="p-title">Первый контакт</div>
+          <p class="p-text">Вы связываетесь с нами любым удобным способом. Мы отвечаем в течение 15 минут в любое время суток.</p>
+        </div>
+        <div class="p-step reveal">
+          <div class="p-num">II</div>
+          <div class="p-title">Понимание запроса</div>
+          <p class="p-text">Ваш персональный менеджер детально выясняет все пожелания, бюджет и временные рамки.</p>
+        </div>
+        <div class="p-step reveal">
+          <div class="p-num">III</div>
+          <div class="p-title">Индивидуальное предложение</div>
+          <p class="p-text">Мы готовим несколько вариантов и представляем вам лучшее решение с полным обоснованием.</p>
+        </div>
+        <div class="p-step reveal">
+          <div class="p-num">IV</div>
+          <div class="p-title">Безупречное исполнение</div>
+          <p class="p-text">Мы берём на себя всю организацию и остаёмся с вами до последней секунды вашего опыта.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TESTIMONIALS ──────────────────────────────────── -->
+  <section id="reviews" class="testi-section">
+    <div class="container">
+      <div class="section-header reveal" style="text-align:center">
+        <span class="section-eyebrow">Клиенты о нас</span>
+        <h2 class="section-title">Слова тех,<br>кто нам <em>доверяет</em></h2>
+      </div>
+
+      <div class="testi-grid">
+        <div class="testi-card reveal">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">«Maison Élite организовали нашу годовщину на яхте у берегов Амальфи. Каждая деталь — от живых цветов до меню — была продумана идеально.»</p>
+          <div class="testi-divider"></div>
+          <div class="testi-author">Наталья и Игорь Б.</div>
+          <div class="testi-role">Москва · Клиент с 2019 года</div>
+        </div>
+
+        <div class="testi-card reveal">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">«Нужен был вылет в Женеву через 3 часа после звонка. Они организовали всё: самолёт, трансфер, отель. Без единой паузы.»</p>
+          <div class="testi-divider"></div>
+          <div class="testi-author">Андрей К.</div>
+          <div class="testi-role">Предприниматель · Клиент с 2017 года</div>
+        </div>
+
+        <div class="testi-card reveal">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">«VIP-ложа на Monaco Grand Prix — это был подарок на день рождения мужа. Он до сих пор говорит, что это лучший день в его жизни.»</p>
+          <div class="testi-divider"></div>
+          <div class="testi-author">Елена В.</div>
+          <div class="testi-role">Санкт-Петербург · Клиент с 2021 года</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FAQ ───────────────────────────────────────────── -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-header reveal" style="text-align:center">
+        <span class="section-eyebrow">Вопросы</span>
+        <h2 class="section-title">Часто<br><em>спрашивают</em></h2>
+      </div>
+
+      <div class="faq-container">
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Как стать клиентом Maison Élite?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Членство в Maison Élite — по приглашению или по рекомендации действующего клиента. Вы также можете оставить заявку на сайте — наш менеджер свяжется с вами в течение 24 часов для предварительного знакомства.</div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Есть ли минимальный бюджет для запроса?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Минимальный порог для первого запроса — от 300 000 рублей. Для постоянных клиентов мы рассматриваем запросы любого масштаба, поскольку ценим долгосрочные отношения превыше всего.</div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            В каких странах вы работаете?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Мы работаем по всему миру. Постоянные офисы — в Москве, Монако и Дубае. Наша партнёрская сеть охватывает более 60 стран, что позволяет организовать любой запрос в любой точке земного шара.</div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Как обеспечивается конфиденциальность?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Абсолютная конфиденциальность — основа нашей работы. Все сотрудники подписывают строгое NDA. Мы никогда не раскрываем имена клиентов и детали запросов. Ваша приватность для нас — священна.</div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Насколько срочные запросы вы принимаете?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">Мы работаем 24/7/365. Срочные запросы — наша специализация. Опыт показывает, что 94% экстренных запросов мы выполняем в течение 6 часов с момента обращения.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ───────────────────────────────────────────── -->
+  <section id="contact" class="cta-section">
+    <div class="cta-ornament">É</div>
+    <div class="container">
+      <div class="cta-content reveal">
+        <span class="section-eyebrow">Начало сотрудничества</span>
+        <h2 class="cta-title">Ваш первый шаг<br>к <em>безупречному</em></h2>
+        <p class="cta-text">Оставьте контакт — персональный менеджер свяжется с вами в течение 15 минут и ответит на все вопросы.</p>
+        <div class="cta-form">
+          <input class="cta-input" type="tel" placeholder="+7 (___) ___-__-__" id="ctaPhone" />
+          <button class="btn-gold" onclick="handleCta()" style="white-space:nowrap">
+            <span>Получить консультацию</span>
+          </button>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:16px;letter-spacing:.04em">Абсолютная конфиденциальность гарантирована</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <a href="#" class="f-logo">Maison <em>Élite</em></a>
+          <p class="f-desc">Консьерж-сервис высшего уровня для тех, кто ценит безупречность в каждой детали. С 2015 года.</p>
+        </div>
+        <div>
+          <div class="f-heading">Услуги</div>
+          <ul class="f-links">
+            <li><a href="#">Яхты</a></li>
+            <li><a href="#">Виллы и резиденции</a></li>
+            <li><a href="#">Частная авиация</a></li>
+            <li><a href="#">Закрытые события</a></li>
+            <li><a href="#">Персональный шоппинг</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="f-heading">Компания</div>
+          <ul class="f-links">
+            <li><a href="#">О нас</a></li>
+            <li><a href="#">Наша команда</a></li>
+            <li><a href="#">Партнёры</a></li>
+            <li><a href="#">Карьера</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="f-heading">Контакты</div>
+          <ul class="f-links">
+            <li><a href="#">Москва</a></li>
+            <li><a href="#">Монако</a></li>
+            <li><a href="#">Дубай</a></li>
+            <li><a href="#">hello@maison-elite.com</a></li>
+            <li><a href="#">+7 (495) 000-00-00</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2025 Maison Élite. Все права защищены.</p>
+        <div class="footer-links-row">
+          <a href="#">Конфиденциальность</a>
+          <a href="#">Соглашение</a>
+          <a href="#">Реквизиты</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── JAVASCRIPT ─────────────────────────────────────── -->
+  <script>
+    // ── Custom cursor ────────────────────────────────────────
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top  = my + 'px';
+    });
+
+    // Ring follows with lag
+    (function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top  = ry + 'px';
+      requestAnimationFrame(animateRing);
+    })();
+
+    // Scale ring on hover over interactive elements
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        ring.style.width = '56px';
+        ring.style.height = '56px';
+        ring.style.borderColor = 'rgba(201,169,110,.7)';
+        cursor.style.opacity = '0';
+      });
+      el.addEventListener('mouseleave', () => {
+        ring.style.width = '36px';
+        ring.style.height = '36px';
+        ring.style.borderColor = 'rgba(201,169,110,.4)';
+        cursor.style.opacity = '1';
+      });
+    });
+
+    // ── Sticky header ────────────────────────────────────────
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // ── Mobile menu ──────────────────────────────────────────
+    function toggleMenu() {
+      const nav = document.getElementById('mobileNav');
+      nav.classList.toggle('open');
+      document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+    }
+
+    // ── Scroll reveal ────────────────────────────────────────
+    const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // Find position among siblings for stagger
+          const siblings = [...entry.target.parentElement.children].filter(c =>
+            c.classList.contains('reveal') || c.classList.contains('reveal-left') || c.classList.contains('reveal-right')
+          );
+          const idx = siblings.indexOf(entry.target);
+          setTimeout(() => entry.target.classList.add('visible'), idx * 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+    revealEls.forEach(el => observer.observe(el));
+
+    // ── FAQ ──────────────────────────────────────────────────
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // ── CTA form ─────────────────────────────────────────────
+    function handleCta() {
+      const phone = document.getElementById('ctaPhone').value.trim();
+      if (phone.length < 6) {
+        document.getElementById('ctaPhone').style.borderColor = 'rgba(201,169,110,.6)';
+        document.getElementById('ctaPhone').placeholder = 'Введите номер телефона';
+        return;
+      }
+      const btn = event.currentTarget;
+      btn.innerHTML = '<span>✓ Заявка принята</span>';
+      btn.style.background = 'var(--gold-dk)';
+      btn.style.pointerEvents = 'none';
+    }
+
+    // ── Smooth nav highlight ─────────────────────────────────
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 150) current = s.id; });
+      navLinks.forEach(l => {
+        l.style.color = l.getAttribute('href') === '#' + current ? 'var(--gold)' : '';
+      });
+    });
+  </script>
+</body>
+</html>
